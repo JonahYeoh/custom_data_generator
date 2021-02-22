@@ -22,11 +22,9 @@ class ActionDataGenerator(object):
         self.temporal_stride = temporal_stride
         self.resize=resize
     def file_generator(self,data_path,data_files):
-        print('fasdfads')
         '''
         data_files - list of csv files to be read.
         '''
-        print('file generator', data_path, data_files)
         for f in data_files:       
             tmp_df = pd.read_csv(os.path.join(data_path,f))
             label_list = list(tmp_df['Label'])
@@ -39,7 +37,6 @@ class ActionDataGenerator(object):
                 print ('num of frames is less than temporal length; hence discarding this file-{}'.format(f))
                 continue
             
-            start_frame = 0
             samples = deque()
             samp_count=0
             for img in img_list:
@@ -49,19 +46,12 @@ class ActionDataGenerator(object):
                     samp_count+=1
                     for t in range(self.temporal_stride):
                         samples.popleft()
-                    print('k')
                     yield samples_c,label_list[0]
 
     def load_samples(self,data_cat='train', test_ratio=0.1):
-        print('load samples')
-        # data_path = os.path.join(self.root_data_path,data_cat)
-        data_path = self.root_data_path
+        data_path = os.path.join(self.root_data_path,data_cat)
         csv_data_files = os.listdir(data_path)
-        print(data_path, csv_data_files)
         file_gen = self.file_generator(data_path,csv_data_files)
-        print(next(file_gen))
-        print('done file_gen')
-        return 0
         iterator = True
         data_list = []
         while iterator:
@@ -74,7 +64,6 @@ class ActionDataGenerator(object):
                 iterator = False
                 print ('end of data generator')
         data_list = self.shuffle_data(data_list)
-        cut = len(data_list)
         return data_list
     
     def shuffle_data(self,samples):
@@ -97,7 +86,7 @@ class ActionDataGenerator(object):
             data = self.shuffle_data(data)
         while True:   
             for offset in range(0, num_samples, batch_size):
-                #print ('startring index: ', offset) 
+                # print ('startring index: ', offset) 
                 # Get the samples you'll use in this batch
                 batch_samples = data[offset:offset+batch_size]
                 # Initialise X_train and y_train arrays for this batch
