@@ -1,7 +1,6 @@
 '''
     auto separate files into train, val, test according to the ratio stated
 '''
-
 import os
 import numpy as np
 import shutil
@@ -21,7 +20,7 @@ def move_video_list(videos, src_dir, dest_dir, activity_name, keep_original=True
         else:
             os.replace(video_path, dest_video_path)
 
-def func(root_dir, dest_dir, ratio=[], shuffle=True, balance=True):
+def split_data(root_dir, dest_dir, ratio=[], shuffle=True, balance=True):
     if not os.path.exists(dest_dir):
         os.mkdir(dest_dir)
     train_path = os.path.join(dest_dir, 'train')
@@ -54,4 +53,4 @@ if __name__ == '__main__':
     dest_dir = 'D:/UCF50_split/'
 
     ratio = [ 0.8, 0.1, 0.1 ]
-    func(root_dir, dest_dir, ratio)
+    split_data(root_dir, dest_dir, ratio)
