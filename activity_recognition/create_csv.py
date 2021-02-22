@@ -2,7 +2,8 @@ import pandas as pd
 import os
 
 def create_csvfiles(data_path, csv_path, labels):
-    data_dir_list = os.listdir(data_path)[:2]
+    print(data_path, csv_path)
+    data_dir_list = os.listdir(data_path)
     for data_dir in data_dir_list: # looping over every activity
         label = labels[str(data_dir)]
         video_list = os.listdir(os.path.join(data_path,data_dir))
@@ -26,7 +27,7 @@ def func(root, csv_path):
             os.mkdir(data_csv)
         # print(data_path, data_csv)
         if labels_name is None:
-            i = 1
+            i = 0
             labels_name=dict()
             for name in os.listdir(data_path):
                 labels_name[name] = i

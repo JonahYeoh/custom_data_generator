@@ -21,6 +21,7 @@ class ActionDataGenerator(object):
         self.temporal_length = temporal_length
         self.temporal_stride = temporal_stride
         self.resize=resize
+
     def file_generator(self,data_path,data_files):
         '''
         data_files - list of csv files to be read.
@@ -31,7 +32,7 @@ class ActionDataGenerator(object):
             total_images = len(label_list) 
             if total_images>=self.temporal_length:
                 num_samples = int((total_images-self.temporal_length)/self.temporal_stride)+1
-                print ('num of samples from vid seq-{}: {}'.format(f,num_samples))
+                # print ('num of samples from vid seq-{}: {}'.format(f,num_samples))
                 img_list = list(tmp_df['FileName'])
             else:
                 print ('num of frames is less than temporal length; hence discarding this file-{}'.format(f))
@@ -63,7 +64,7 @@ class ActionDataGenerator(object):
                 print ('the exception: ',e)
                 iterator = False
                 print ('end of data generator')
-        data_list = self.shuffle_data(data_list)
+        # data_list = self.shuffle_data(data_list)
         return data_list
     
     def shuffle_data(self,samples):
@@ -76,7 +77,7 @@ class ActionDataGenerator(object):
         img = img/255 # scaling
         return img
     
-    def data_generator(self,data,batch_size=10,shuffle=True):              
+    def data_generator(self,data,batch_size=10,shuffle=True, n_classes=50):              
         """
         Yields the next training batch.
         data is an array [[img1_filename,img2_filename...,img16_filename],label1], [image2_filename,label2],...].
@@ -103,7 +104,7 @@ class ActionDataGenerator(object):
                             img = cv2.imread(img)
                             #apply any kind of preprocessing here
                             #img = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-                            img = self.preprocess_image(img)
+                            img = self.preprocess_image(img, False)
                             temp_data_list.append(img)
     
                         except Exception as e:
@@ -120,22 +121,19 @@ class ActionDataGenerator(object):
                 X_train = np.array(X_train)
                 #X_train = np.rollaxis(X_train,1,4)
                 y_train = np.array(y_train)
-                y_train = utils.to_categorical(y_train, 3)
-
+                y_train = utils.to_categorical(y_train, n_classes)
+                print(y_train.shape)
                 # The generator-y part: yield the next training batch            
                 yield X_train, y_train
 
 if __name__=='__main__':
     
-    root_data_path='D:/activity_file/data_files'
+    root_data_path='G:\\video_data\\activity_file\\csv_files\\'
     print(root_data_path)
     data_gen_obj=ActionDataGenerator(root_data_path,temporal_stride=1,temporal_length=16)
-    print('1')
     train_data = data_gen_obj.load_samples(data_cat='train')
-    print('2')
-    '''
     print('num of train_samples: {}'.format(len(train_data)))
-
+    print(type(train_data), len(train_data))
     train_data[0]
 
     test_data = data_gen_obj.load_samples(data_cat='test')
@@ -154,11 +152,11 @@ if __name__=='__main__':
     y_0=y[0]
     print('x_0 shape: ',x_0.shape)
     print('y_0 shape: ',y_0.shape)
-    
+
+    '''
     print(Config.labels_to_class)
     activity = Config.labels_to_class[np.argmax(y_0)]
     print(activity)
-    
     # plot the first sample
     num_of_images=16
     fig=plt.figure(figsize=(8,8))	
