@@ -5,13 +5,19 @@ import cv2
 def vid_to_frames(root_dir, dest_dir, rescale=True, preserved_aspect_ratio=True, scale=0.8):
     if not os.path.exists(dest_dir):
         os.mkdir(dest_dir)
-    activity_list = os.listdir(root_dir)
-    for activity in activity_list: # loop over every activity folder
-        activity_path = os.path.join(root_dir,activity) # 'UCF-101/Archery'
-        dest_activity_path = os.path.join(dest_dir,activity) # 'activity_data/Archery'
-        if not os.path.exists(dest_activity_path):
-            os.mkdir(dest_activity_path)
-        write_frames(activity_path,dest_activity_path, rescale, preserved_aspect_ratio, scale)
+    cat_list = os.listdir(root_dir) # train, test, val
+    for cat in cat_list:
+        cat_path = os.path.join(root_dir, cat)
+        activity_list = os.listdir(cat_path)
+        cat_dest_path = os.path.join(dest_dir, cat)
+        if not os.path.exists(cat_dest_path):
+            os.mkdir(cat_dest_path)
+        for activity in activity_list: # loop over every activity folder
+            activity_path = os.path.join(cat_path,activity) # 'UCF-101/Archery'
+            dest_activity_path = os.path.join(cat_dest_path,activity) # 'activity_data/Archery'
+            if not os.path.exists(dest_activity_path):
+                os.mkdir(dest_activity_path)
+            write_frames(activity_path,dest_activity_path, rescale, preserved_aspect_ratio, scale)
 
 def write_frames(activity_path,dest_activity_path, rescale, preserved_aspect_ratio, scale, frame_format='jpg', abs_dim=None):
     # read the list of video from 'UCF-101/train/Archery' - [v_Archery_g01_c01.avi,v_Archery_g01_c01.avi, ......]
@@ -54,7 +60,7 @@ def write_frames(activity_path,dest_activity_path, rescale, preserved_aspect_rat
                 cap.release()
 
 if __name__ == '__main__':
-    root = '../../root_file'
-    dest = 'D:/activity_file/jpg'
+    root = 'G:\\video_data\\UCF50_split\\'
+    dest = 'G:\\video_data\\activity_file\\data_files\\'
     vid_to_frames(root, dest)
     
