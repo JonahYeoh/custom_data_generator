@@ -10,8 +10,7 @@ from collections import deque
 import copy
 import matplotlib
 import matplotlib.pyplot as plt
-from keras.utils import np_utils
-
+from tensorflow.keras import utils
 from config import Config
 
 class ActionDataGenerator(object):
@@ -23,9 +22,11 @@ class ActionDataGenerator(object):
         self.temporal_stride = temporal_stride
         self.resize=resize
     def file_generator(self,data_path,data_files):
+        print('fasdfads')
         '''
         data_files - list of csv files to be read.
         '''
+        print('file generator', data_path, data_files)
         for f in data_files:       
             tmp_df = pd.read_csv(os.path.join(data_path,f))
             label_list = list(tmp_df['Label'])
@@ -47,13 +48,20 @@ class ActionDataGenerator(object):
                     samples_c=copy.deepcopy(samples)
                     samp_count+=1
                     for t in range(self.temporal_stride):
-                        samples.popleft() 
+                        samples.popleft()
+                    print('k')
                     yield samples_c,label_list[0]
 
-    def load_samples(self,data_cat='train'):
-        data_path = os.path.join(self.root_data_path,data_cat)
+    def load_samples(self,data_cat='train', test_ratio=0.1):
+        print('load samples')
+        # data_path = os.path.join(self.root_data_path,data_cat)
+        data_path = self.root_data_path
         csv_data_files = os.listdir(data_path)
+        print(data_path, csv_data_files)
         file_gen = self.file_generator(data_path,csv_data_files)
+        print(next(file_gen))
+        print('done file_gen')
+        return 0
         iterator = True
         data_list = []
         while iterator:
@@ -65,15 +73,18 @@ class ActionDataGenerator(object):
                 print ('the exception: ',e)
                 iterator = False
                 print ('end of data generator')
+        data_list = self.shuffle_data(data_list)
+        cut = len(data_list)
         return data_list
     
     def shuffle_data(self,samples):
         data = shuffle(samples,random_state=2)
         return data
     
-    def preprocess_image(self,img):
-        img = cv2.resize(img,(self.resize,self.resize))
-        img = img/255
+    def preprocess_image(self,img, transform=True):
+        if transform:
+            img = cv2.resize(img,(self.resize,self.resize))
+        img = img/255 # scaling
         return img
     
     def data_generator(self,data,batch_size=10,shuffle=True):              
@@ -120,19 +131,20 @@ class ActionDataGenerator(object):
                 X_train = np.array(X_train)
                 #X_train = np.rollaxis(X_train,1,4)
                 y_train = np.array(y_train)
-                y_train = np_utils.to_categorical(y_train, 3)
+                y_train = utils.to_categorical(y_train, 3)
 
                 # The generator-y part: yield the next training batch            
                 yield X_train, y_train
 
 if __name__=='__main__':
     
-    root_data_path='data_files'
-    
+    root_data_path='D:/activity_file/data_files'
+    print(root_data_path)
     data_gen_obj=ActionDataGenerator(root_data_path,temporal_stride=1,temporal_length=16)
-
+    print('1')
     train_data = data_gen_obj.load_samples(data_cat='train')
-
+    print('2')
+    '''
     print('num of train_samples: {}'.format(len(train_data)))
 
     train_data[0]
@@ -171,3 +183,4 @@ if __name__=='__main__':
         plt.yticks([])
         plt.tight_layout()
     plt.show()
+    '''
