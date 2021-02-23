@@ -15,12 +15,13 @@ from config import Config
 
 class ActionDataGenerator(object):
     
-    def __init__(self,root_data_path,temporal_stride=1,temporal_length=16,resize=224):
+    def __init__(self,root_data_path,temporal_stride=1,temporal_length=16,resize=224, max_sample=20):
         
         self.root_data_path = root_data_path
         self.temporal_length = temporal_length
         self.temporal_stride = temporal_stride
         self.resize=resize
+        self.max_sample=max_sample
 
     def file_generator(self,data_path,data_files):
         '''
@@ -41,6 +42,8 @@ class ActionDataGenerator(object):
             samples = deque()
             samp_count=0
             for img in img_list:
+                if samp_count == self.max_sample:
+                    break
                 samples.append(img)
                 if len(samples)==self.temporal_length:
                     samples_c=copy.deepcopy(samples)
@@ -72,12 +75,12 @@ class ActionDataGenerator(object):
         return data
     
     def preprocess_image(self,img, transform=True):
-        if transform:
-            img = cv2.resize(img,(self.resize,self.resize))
+        if transform and img.shape != (192, 256, 3):
+            img = cv2.resize(img,(256, 192))
         img = img/255 # scaling
         return img
     
-    def data_generator(self,data,batch_size=10,shuffle=True, n_classes=50):              
+    def data_generator(self,data,batch_size=10, shuffle=True, n_classes=50):              
         """
         Yields the next training batch.
         data is an array [[img1_filename,img2_filename...,img16_filename],label1], [image2_filename,label2],...].
@@ -104,13 +107,13 @@ class ActionDataGenerator(object):
                             img = cv2.imread(img)
                             #apply any kind of preprocessing here
                             #img = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-                            img = self.preprocess_image(img, False)
+                            img = self.preprocess_image(img, True)
+                            # if img.shape != (192, 256, 3):
+                            #    print('>>', img.shape)
                             temp_data_list.append(img)
-    
                         except Exception as e:
                             print (e)
                             print ('error reading file: ',img)  
-    
                     # Read label (y)
                     #label = label_names[y]
                     # Add example to arrays
@@ -118,11 +121,10 @@ class ActionDataGenerator(object):
                     y_train.append(y)
         
                 # Make sure they're numpy arrays (as opposed to lists)
-                X_train = np.array(X_train)
+                X_train = np.array(X_train, dtype='object')
                 #X_train = np.rollaxis(X_train,1,4)
                 y_train = np.array(y_train)
                 y_train = utils.to_categorical(y_train, n_classes)
-                print(y_train.shape)
                 # The generator-y part: yield the next training batch            
                 yield X_train, y_train
 

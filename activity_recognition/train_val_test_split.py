@@ -49,8 +49,8 @@ def split_data(root_dir, dest_dir, ratio=[], shuffle=True, balance=True):
         move_video_list(test, activity_path, test_path, activity)
 
 if __name__ == '__main__':
-    root_dir = 'D:/UCF50/'
-    dest_dir = 'D:/UCF50_split/'
+    root_dir = 'G:/video_data/small_world/'
+    dest_dir = 'G:/video_data/small_world_split/'
 
     ratio = [ 0.8, 0.1, 0.1 ]
     split_data(root_dir, dest_dir, ratio)

@@ -36,6 +36,6 @@ def func(root, csv_path):
         create_csvfiles(data_path, data_csv, labels_name)
 
 if __name__ == '__main__':
-    root_data_dir = 'G:\\video_data\\activity_file\\data_files\\'
-    csv_path = 'G:\\video_data\\activity_file\\csv_files\\'
+    root_data_dir = 'G:\\video_data\\small_activity_file\\data_files\\'
+    csv_path = 'G:\\video_data\\small_activity_file\\csv_files\\'
     func(root_data_dir, csv_path)

@@ -60,7 +60,7 @@ def write_frames(activity_path,dest_activity_path, rescale, preserved_aspect_rat
                 cap.release()
 
 if __name__ == '__main__':
-    root = 'G:\\video_data\\UCF50_split\\'
-    dest = 'G:\\video_data\\activity_file\\data_files\\'
+    root = 'G:\\video_data\\small_world_split\\'
+    dest = 'G:\\video_data\\small_activity_file\\data_files\\'
     vid_to_frames(root, dest)
     
